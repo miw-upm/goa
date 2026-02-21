@@ -2,9 +2,9 @@
 
 ## 1️⃣ Crear instancia AWS LightSail
 
-### Especificacionesa
+### Especificaciones
 - Ubuntu 22.04 LTS
-- 2GB RAM (preferible 4GB)
+- 2GB RAM (preferable 4GB)
 - Crear una IP estática y asignarla
 
 ### Firewall. Abrir
@@ -51,24 +51,11 @@ sudo systemctl status nginx
    sudo nano /etc/nginx/sites-available/default
    ```
    
-### Contenido mínimo
-```bash
-server {
-listen 80;
-server_name gestion.ocanabogados.es;
-
-    root /var/www/goa-front;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
 2. Reemplazar el contenido con la siguiente configuración:
    ```nginx
-   server { listen 443 ssl; server_name gestion.ocanabogados.es;
+   server {
+       listen 443 ssl;
+       server_name gestion.ocanabogados.es;
 
        ssl_certificate /etc/letsencrypt/live/gestion.ocanabogados.es/fullchain.pem;
        ssl_certificate_key /etc/letsencrypt/live/gestion.ocanabogados.es/privkey.pem;
