@@ -224,7 +224,7 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ---
 
 ## Notas adicionales
-- Esta configuración establece un servidor para la aplicación GOA de Ocan Abogados
+- Esta configuración establece un servidor para la aplicación GOA de Ocaña Abogados
 - NGINX actúa como proxy inverso para el backend que corre en el puerto 8080
 - Los certificados SSL se renuevan automáticamente con Certbot
 - La aplicación utiliza Docker para su despliegue y gestión

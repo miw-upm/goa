@@ -23,4 +23,4 @@ y con almacenamiento en bases de datos con JPA soportado por Hibernate y Postgre
 | **GOA Eureka**     | [![CI goa-eureka](https://github.com/miw-upm/goa-eureka/actions/workflows/ci.yml/badge.svg)](https://github.com/miw-upm/goa-eureka/actions/workflows/ci.yml)            | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=miw-upm-github_micro-eureka\&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=miw-upm-github_micro-eureka)    | —   |
 
 ### Diagrama de despliegue
-![Deploy](deploy.png)
+![Deploy](deploy/deploy.png)
