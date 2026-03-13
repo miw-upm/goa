@@ -91,11 +91,39 @@ sudo systemctl status nginx
            proxy_set_header X-Real-IP $remote_addr;
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-        location = /api/goa-document {
-           return 301 /api/goa-document/;
-        }
+       }
+       location = /api/goa-document {
+          return 301 /api/goa-document/;
+       }
+   
+	   # /api/goa-ai1/* -> App Runner (strip /api/ai1)
+       location ^~ /api/goa-ai1/ {
+           proxy_pass https://8xmzp52n8h.eu-west-1.awsapprunner.com/;
+           proxy_http_version 1.1;
+		   proxy_set_header Host 8xmzp52n8h.eu-west-1.awsapprunner.com;
+           proxy_ssl_server_name on;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+       location = /api/goa-ai1 {
+          return 301 /api/goa-ai1/;
+       }   
 
+   	   # /api/goa-ai2/* -> App Runner (strip /api/ai2)
+       location ^~ /api/goa-ai2/ {
+           proxy_pass https://y6h73zxqxe.eu-west-1.awsapprunner.com/;
+           proxy_http_version 1.1;
+		   proxy_set_header Host y6h73zxqxe.eu-west-1.awsapprunner.com;
+           proxy_ssl_server_name on;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+       location = /api/goa-ai2 {
+          return 301 /api/goa-ai2/;
+       }  
+      
        location /login {
            proxy_pass http://127.0.0.1:8080/goa-user/login;
            proxy_http_version 1.1;
