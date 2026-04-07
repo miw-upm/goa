@@ -158,9 +158,9 @@ sudo certbot renew --dry-run
 ## 7️⃣. Desplegar Angular
 - Configurar variables de entorno AWS
 
-## 6. Instalación y Configuración de Docker
+## 8️⃣. Instalación y Configuración de Docker
 
-## 8️⃣. Instalación de Docker
+## Instalación de Docker
 ```bash
 sudo apt update
 sudo apt install -y docker.io 
@@ -197,7 +197,7 @@ docker network ls
 docker network inspect goa
 ```
 
-## 8️⃣. Optimización del Servidor
+## 9️⃣ Optimización del Servidor
 
 ### Verificación de memoria disponible
 ```bash
