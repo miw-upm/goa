@@ -3,18 +3,21 @@
 ## 1️⃣ Crear instancia AWS LightSail
 
 ### Especificaciones
-- Ubuntu 22.04 LTS
-- 2GB RAM (preferable 4GB)
-- Crear una IP estática y asignarla
+- Operating system (OS) only: Ubuntu 22.04 LTS
+- General purpose
+- 2GB RAM (preferable 4GB) (First 90 days free)
+- Establecer nombre: goa
+- Crear una IP estática y asignarla (Networking/attach static IP)
 
-### Firewall. Abrir
-- TCP 80
-- TCP 443
+### Firewall. Abrir (IPv4 & IPv6)
+- SSH TCP 22 (Lightsail browser SSH)
+- HTTP TCP 80 (Any IPv4 address)
+- HTTPS TCP 443 (Any IPv4 address)
 
 ## 2️⃣ Configuración DNS
 
 ### Configuración de registros DNS
-1. Añadir registro A: `gestion.ocanabogados.es. 0 A 15.188.215.62`
+1. Añadir registro A: `gestion.ocanabogados.es. 0 A 34.246.233.225`
 2. Verificar la configuración DNS:
    ```bash
    nslookup gestion.ocanabogados.es
@@ -30,6 +33,7 @@ lsb_release -a
 ### Actualización del sistema
 ```bash
 sudo apt update && sudo apt upgrade -y
+sudo reboot
 ```
 
 ## 4️⃣ Instalar NGINX
@@ -54,11 +58,8 @@ sudo systemctl status nginx
 2. Reemplazar el contenido con la siguiente configuración:
    ```nginx
    server {
-       listen 443 ssl;
+       listen 80;
        server_name gestion.ocanabogados.es;
-
-       ssl_certificate /etc/letsencrypt/live/gestion.ocanabogados.es/fullchain.pem;
-       ssl_certificate_key /etc/letsencrypt/live/gestion.ocanabogados.es/privkey.pem;
 
        root /var/www/goa-front;
        index index.html;
@@ -73,16 +74,7 @@ sudo systemctl status nginx
            try_files $uri $uri/ /index.html;
        }
 
-       location /api/ {
-           proxy_pass http://127.0.0.1:8080/;
-           proxy_http_version 1.1;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header Cookie $http_cookie;
-       }
-	   
-	   # /api/goa-document/* -> App Runner (strip /api/goa-document)
+   	   # /api/goa-document/* -> App Runner (strip /api/goa-document)
        location ^~ /api/goa-document/ {
            proxy_pass https://qxjem7fxjz.eu-west-1.awsapprunner.com/;
            proxy_http_version 1.1;
@@ -95,36 +87,17 @@ sudo systemctl status nginx
        location = /api/goa-document {
           return 301 /api/goa-document/;
        }
-   
-	   # /api/goa-ai1/* -> App Runner (strip /api/ai1)
-       location ^~ /api/goa-ai1/ {
-           proxy_pass https://8xmzp52n8h.eu-west-1.awsapprunner.com/;
-           proxy_http_version 1.1;
-		   proxy_set_header Host 8xmzp52n8h.eu-west-1.awsapprunner.com;
-           proxy_ssl_server_name on;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-       }
-       location = /api/goa-ai1 {
-          return 301 /api/goa-ai1/;
-       }   
 
-   	   # /api/goa-ai2/* -> App Runner (strip /api/ai2)
-       location ^~ /api/goa-ai2/ {
-           proxy_pass https://y6h73zxqxe.eu-west-1.awsapprunner.com/;
+       location /api/ {
+           proxy_pass http://127.0.0.1:8080;
            proxy_http_version 1.1;
-		   proxy_set_header Host y6h73zxqxe.eu-west-1.awsapprunner.com;
-           proxy_ssl_server_name on;
+           proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_set_header Cookie $http_cookie;
        }
-       location = /api/goa-ai2 {
-          return 301 /api/goa-ai2/;
-       }  
-      
-       location /login {
+   
+	   location /login {
            proxy_pass http://127.0.0.1:8080/goa-user/login;
            proxy_http_version 1.1;
            proxy_set_header Host $host;
@@ -151,28 +124,8 @@ sudo systemctl status nginx
        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
    }
 
-   server {
-       listen 80;
-       server_name gestion.ocanabogados.es;
-       return 301 https://$host$request_uri;
-   }
    ```
-
-3. Copiar el archivo `index.html` a la carpeta raíz del sitio web:
-   ```bash
-   # Asegúrate de crear el directorio primero
-   sudo mkdir -p /var/www/goa-front
-   # Copia tu archivo index.html
-   sudo cp /ruta/a/tu/index.html /var/www/goa-front/
-   ```
-
-4. Verificar la configuración y reiniciar NGINX:
-   ```bash
-   sudo nginx -t
-   sudo systemctl restart nginx
-   ```
-
-## 5. Instalación de Certificados SSL
+## 6️⃣. Instalación de Certificados SSL
 
 ### Instalación de Certbot
 ```bash
@@ -183,6 +136,7 @@ sudo apt install certbot python3-certbot-nginx -y
 ### Obtención de certificado SSL
 ```bash
 sudo certbot --nginx -d gestion.ocanabogados.es
+j.bernal@upm.es Y ...
 ```
 
 ### Verificación de renovación automática
@@ -190,9 +144,23 @@ sudo certbot --nginx -d gestion.ocanabogados.es
 sudo certbot renew --dry-run
 ```
 
+### Verificación de SSL
+1. Editar el archivo de configuración y Y comprobar que todo ha ido bien y Cerbot lo ha actualizado
+   ```bash
+   sudo nano /etc/nginx/sites-available/default
+   ```
+2. Verificar la configuración y reiniciar NGINX:
+   ```bash
+   sudo nginx -t
+   sudo systemctl restart nginx
+   ```
+
+## 7️⃣. Desplegar Angular
+- Configurar variables de entorno AWS
+
 ## 6. Instalación y Configuración de Docker
 
-### Instalación de Docker
+## 8️⃣. Instalación de Docker
 ```bash
 sudo apt update
 sudo apt install -y docker.io 
@@ -229,7 +197,7 @@ docker network ls
 docker network inspect goa
 ```
 
-## 7. Optimización del Servidor
+## 8️⃣. Optimización del Servidor
 
 ### Verificación de memoria disponible
 ```bash
