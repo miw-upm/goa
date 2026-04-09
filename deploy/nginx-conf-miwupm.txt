@@ -1,0 +1,98 @@
+server {
+    server_name goa.miwupm.es;
+
+    root /var/www/goa-front;
+    index index.html;
+    server_tokens off;
+    autoindex off;
+
+    location ~* \.(php|pl|py|sh|cgi|rb)$ {
+        return 403;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # /api/goa-chatbot/* -> App Runner (strip /api/goa-chatbot)
+    location ^~ /api/goa-chatbot/ {
+        proxy_pass https://tqnubzb5ee.eu-west-1.awsapprunner.com/;
+        proxy_http_version 1.1;
+        proxy_set_header Host tqnubzb5ee.eu-west-1.awsapprunner.com;
+        proxy_ssl_server_name on;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location = /api/goa-chatbot {
+        return 301 /api/goa-chatbot/;
+    }
+
+    # /api/goa-document/* -> App Runner (strip /api/goa-document)
+    location ^~ /api/goa-document/ {
+        proxy_pass https://qxjem7fxjz.eu-west-1.awsapprunner.com/;
+        proxy_http_version 1.1;
+        proxy_set_header Host qxjem7fxjz.eu-west-1.awsapprunner.com;
+        proxy_ssl_server_name on;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location = /api/goa-document {
+       return 301 /api/goa-document/;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Cookie $http_cookie;
+    }
+
+    location /login {
+        proxy_pass http://127.0.0.1:8080/goa-user/login;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /default-ui.css/ {
+        proxy_pass http://127.0.0.1:8080/default-ui.css;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /oauth2/ {
+        proxy_pass http://127.0.0.1:8080/oauth2/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Cookie $http_cookie;
+    }
+
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/goa.miwupm.es/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/goa.miwupm.es/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = goa.miwupm.es) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+
+    server_name goa.miwupm.es;
+    return 404; # managed by Certbot
+}

@@ -1,0 +1,70 @@
+server {
+    server_name gestion.ocanabogados.es;
+
+    root /var/www/goa-front;
+    index index.html;
+    server_tokens off;
+    autoindex off;
+
+    location ~* \.(php|pl|py|sh|cgi|rb)$ {
+        return 403;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Cookie $http_cookie;
+    }
+
+    location /login {
+        proxy_pass http://127.0.0.1:8080/goa-user/login;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /default-ui.css/ {
+        proxy_pass http://127.0.0.1:8080/default-ui.css;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /oauth2/ {
+        proxy_pass http://127.0.0.1:8080/oauth2/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Cookie $http_cookie;
+    }
+       gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/gestion.ocanabogados.es/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/gestion.ocanabogados.es/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    }
+
+    server {
+        if ($host = gestion.ocanabogados.es) {
+            return 301 https://$host$request_uri;
+        } # managed by Certbot
+
+        listen 80;
+        server_name gestion.ocanabogados.es;
+        return 404; # managed by Certbot
+    }
